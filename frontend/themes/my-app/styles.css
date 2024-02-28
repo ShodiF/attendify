@@ -1,0 +1,9 @@
+@import url('./main-layout.css');
+@import url('./views/attendance-sheet-view.css');
+@import url('./views/attendance-sheet-teacher-view.css');
+@import url('./views/schedule-view.css');
+@import url('./views/record-view.css');
+@import url('./views/profile-view.css');
+@import url('./views/student-stats-view.css');
+@import url('./views/teachers-record-view.css');
+@import url('./views/user-management-view.css');
