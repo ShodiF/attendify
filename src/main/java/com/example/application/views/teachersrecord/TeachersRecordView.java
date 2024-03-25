@@ -17,12 +17,17 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 @PageTitle("Teacher's Record")
 @Route(value = "teachRecord", layout = MainLayout.class)
 @Uses(Icon.class)
+@PermitAll
+@RolesAllowed("TEACHER")
 public class TeachersRecordView extends Composite<VerticalLayout> {
 
     public TeachersRecordView() {
@@ -51,6 +56,8 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         layoutRow.add(select);
         layoutRow.add(dateTimePicker);
         getContent().add(basicGrid);
+
+        basicGrid.setColumns("firstName", "surname", "studentID", "yearOfStudy", "attendance");
     }
 
     record SampleItem(String value, String label, Boolean disabled) {

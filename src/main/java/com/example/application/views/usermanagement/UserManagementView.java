@@ -29,12 +29,16 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import java.util.Optional;
+
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @PageTitle("User Management")
 @Route(value = "userManage/:samplePersonID?/:action?(edit)", layout = MainLayout.class)
 @Uses(Icon.class)
+@RolesAllowed("ADMIN")
 public class UserManagementView extends Div implements BeforeEnterObserver {
 
     private final String SAMPLEPERSON_ID = "samplePersonID";
