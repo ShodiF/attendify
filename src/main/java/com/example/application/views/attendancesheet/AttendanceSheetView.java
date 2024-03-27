@@ -13,6 +13,8 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -20,8 +22,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.io.InputStream;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +44,18 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         H3 warning = new H3("Please make sure to fill in all required forms.");
         warning.setVisible(false);
         warning.getStyle().set("color", "red");
+
+        MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
+        Upload upload = new Upload(buffer);
+        upload.setVisible(false);
+
+        upload.addSucceededListener(event -> {
+            String fileName = event.getFileName();
+            InputStream inputStream = buffer.getInputStream(fileName);
+
+            // Do something with the file data
+            // processFile(inputStream, fileName);
+        });
 
         HorizontalLayout layoutRow = new HorizontalLayout();
         VerticalLayout layoutColumn2 = new VerticalLayout();
@@ -72,7 +88,7 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         select3.setWidth("min-content");
         getContent().add(layoutRow);
         layoutRow.add(layoutColumn2);
-        layoutColumn2.add(layoutRow2, warning);
+        layoutColumn2.add(layoutRow2, warning, upload);
         layoutRow2.add(select);
         layoutRow2.add(select2);
         layoutRow2.add(dateTimePicker);
@@ -81,16 +97,18 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         layoutRow2.setVerticalComponentAlignment(FlexComponent.Alignment.END, mark);
 
         select3.addValueChangeListener(event -> {
-            System.out.println(dateTimePicker.getValue());
-            LocalDateTime now = LocalDateTime.now();
-
-            System.out.println(now);
+            if(select3.getValue() == "Absent"){
+                upload.setVisible(true);
+            }
+            else{
+                upload.setVisible(false);
+            }
         });
 
         dateTimePicker.addValueChangeListener(event -> {
             String currentDateTime = LocalDateTime.now().toString();
             String selectedDateTime = dateTimePicker.getValue().toString();
-            if(selectedDateTime.substring(0,13).equals(currentDateTime.substring(0,13))){
+            if(selectedDateTime.substring(0,10).equals(currentDateTime.substring(0,10)) && Integer.valueOf(selectedDateTime.substring(11,13)) == Integer.valueOf(currentDateTime.substring(11,13))-1 ){
                 System.out.println("Same day and time");
                 select3.setItems("Present", "Absent");
             }
