@@ -4,5 +4,5 @@ RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
 COPY --from=build /target/my-app-1.0-SNAPSHOT.jar demo.jar
-EXPOSE 3306
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "demo.jar"]
