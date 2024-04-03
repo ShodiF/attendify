@@ -13,6 +13,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.router.PageTitle;
@@ -22,6 +23,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.awt.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -38,7 +41,7 @@ import static com.example.application.views.MainLayout.currentStudent;
 @Uses(Icon.class)
 @RolesAllowed("USER")
 public class AttendanceSheetView extends Composite<VerticalLayout> {
-
+    String fileName;
     public AttendanceSheetView() {
         Button mark = new Button("Take Attendance");
         H3 warning = new H3("Please make sure to fill in all required forms.");
@@ -50,12 +53,10 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         upload.setVisible(false);
 
         upload.addSucceededListener(event -> {
-            String fileName = event.getFileName();
-            InputStream inputStream = buffer.getInputStream(fileName);
-
-            // Do something with the file data
-            // processFile(inputStream, fileName);
+            fileName = event.getFileName();
         });
+
+        TextField textField = new TextField("Code");
 
         HorizontalLayout layoutRow = new HorizontalLayout();
         VerticalLayout layoutColumn2 = new VerticalLayout();
@@ -93,10 +94,12 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         layoutRow2.add(select2);
         layoutRow2.add(dateTimePicker);
         layoutRow2.add(select3);
+        layoutRow2.add(textField);
         layoutRow2.add(mark);
         layoutRow2.setVerticalComponentAlignment(FlexComponent.Alignment.END, mark);
 
         select3.addValueChangeListener(event -> {
+
             if(select3.getValue() == "Absent"){
                 upload.setVisible(true);
             }
@@ -119,10 +122,13 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         });
 
         mark.addClickListener(buttonClickEvent -> {
-            if(select.isEmpty() || select2.isEmpty() || select3.isEmpty() || dateTimePicker.isEmpty()){
+            if(select.isEmpty() || select2.isEmpty() || select3.isEmpty() || dateTimePicker.isEmpty() || textField.isEmpty()){
+                warning.setText("Please make sure to fill in all required forms.");
                 warning.setVisible(true);
             }
-            else{
+            else if(textField.getValue().equals("1111")){
+                InputStream inputStream = buffer.getInputStream(fileName);
+
                 boolean attend = false;
                 warning.setVisible(false);
                 if(select3.getValue() == "Present"){
@@ -138,7 +144,7 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                 String sqlThree = "insert into attendance (\"attendanceID\", \"classAttended\", \"typeOfAttendance\") \n" +
                         "\tvalues \n" +
                         "\t((select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime +
-                        "' ),"  + attend + ", 'Online')";
+                        "' ),"  + attend + ", 'Online')" ;
                 String sqlUpdate = "update attendance set \"classAttended\" = " + attend +
                         " where \"attendanceID\" = (select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "')";
                 System.out.println(sqlUpdate);
@@ -147,6 +153,7 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                 String password = "password";
                 System.out.println(sql);
                 try {
+
                     Connection con = DriverManager.getConnection(url, username, password);
                     Statement st = con.createStatement();
                     ResultSet rs = st.executeQuery(sqlTwo);
@@ -162,6 +169,10 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
+            }
+            else{
+                warning.setText("Incorrect Code! Review and try again!");
+                warning.setVisible(true);
             }
         });
 
