@@ -14,7 +14,6 @@ import java.sql.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MainLayoutTest {
-
     private static final String URL = "jdbc:postgresql://localhost:5432/AttendiftDBS";
     private static final String USERNAME = "postgres";
     private static final String PASSWORD = "password";
@@ -39,11 +38,10 @@ class MainLayoutTest {
 
         String sql = "select * from students where username = '" + susername + "'";
         System.out.println(sql);
-        String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
         String username = "postgres";
         String password = "password";
         try {
-            Connection con = DriverManager.getConnection(url, username, password);
+            Connection con = DriverManager.getConnection(URL, username, password);
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
             rs.next();
@@ -61,7 +59,7 @@ class MainLayoutTest {
     }
 
     @Test
-    void studentCorrectTraits() {
+    void userCorrectTraits() {
         assertEquals("John", s.getFirstName());
         assertEquals("Smith", s.getSurname());
         assertEquals("J.Smith", s.getUsername());

@@ -7,12 +7,13 @@ import com.example.application.data.AttendanceReport;
 import org.junit.jupiter.api.Test;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RecordViewTest {
-
+    public String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
     public ArrayList<AttendanceReport> listOfAtt = new ArrayList<>();
     public ArrayList<String> subjects = new ArrayList<>();
     public ArrayList<String> cIDs = new ArrayList<>();
@@ -30,7 +31,6 @@ class RecordViewTest {
 
         String sql = "select * from attendance";
         String sql2 = "select * from \"attendanceReport\"";
-        String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
         String username = "postgres";
         String password = "password";
         System.out.println(sql);
@@ -121,6 +121,13 @@ class RecordViewTest {
 
         select.setValue("Jibberish");
         assertEquals(true, tempList.isEmpty());
+    }
+    @Test
+    void timeIsCorrect(){
+        select.setValue("Math");
+        assertEquals("2024-03-25 14:00", tempList.get(0).getDateAndTime());
+        select.setValue("History");
+        assertEquals("2024-03-22 02:00", tempList.get(0).getDateAndTime());
     }
 
 }

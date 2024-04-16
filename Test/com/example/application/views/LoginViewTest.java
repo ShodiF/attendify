@@ -49,7 +49,7 @@ class LoginViewTest {
 
     @Test
     void errorMessageShows(){
-        driver.get("http://localhost:8090/login?error");
+        driver.get("http://attendance-management-system.com/login?error");
         if(driver.getCurrentUrl().contains("error")){
             loginForm.setError(true);
         }

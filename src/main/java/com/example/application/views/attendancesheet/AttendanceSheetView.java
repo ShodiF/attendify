@@ -1,5 +1,6 @@
 package com.example.application.views.attendancesheet;
 
+import com.example.application.data.Courses;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.button.Button;
@@ -22,6 +23,7 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import org.apache.commons.compress.archivers.ar.ArArchiveEntry;
 
 import java.awt.*;
 import java.io.IOException;
@@ -42,6 +44,8 @@ import static com.example.application.views.MainLayout.currentStudent;
 @RolesAllowed("USER")
 public class AttendanceSheetView extends Composite<VerticalLayout> {
     String fileName;
+    ArrayList<String> courseIDs = new ArrayList<>();
+    ArrayList<Courses> courses = new ArrayList<>();
     public AttendanceSheetView() {
         Button mark = new Button("Take Attendance");
         H3 warning = new H3("Please make sure to fill in all required forms.");
@@ -56,8 +60,14 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
             fileName = event.getFileName();
         });
 
-        TextField textField = new TextField("Code");
+        getCourses();
 
+        TextField textField = new TextField("Code");
+        TextField reasonForAbsence = new TextField("Reason For Absence: ");
+        reasonForAbsence.getElement().getStyle().setWidth("300px");
+        reasonForAbsence.setVisible(false);
+
+        HorizontalLayout specialReason = new HorizontalLayout(upload, reasonForAbsence);
         HorizontalLayout layoutRow = new HorizontalLayout();
         VerticalLayout layoutColumn2 = new VerticalLayout();
         HorizontalLayout layoutRow2 = new HorizontalLayout();
@@ -79,20 +89,18 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         layoutRow2.getStyle().set("flex-grow", "1");
         select.setLabel("Subject");
         select.setWidth("min-content");
-        setSelectSampleDataSubject(select);
         select2.setLabel("Section");
         select2.setWidth("min-content");
-        setSelectSampleDataSectionSection(select2);
         dateTimePicker.setLabel("Date time picker");
         dateTimePicker.setWidth("min-content");
         select3.setLabel("Attendance");
         select3.setWidth("min-content");
         getContent().add(layoutRow);
         layoutRow.add(layoutColumn2);
-        layoutColumn2.add(layoutRow2, warning, upload);
+        layoutColumn2.add(layoutRow2, warning, specialReason);
+        layoutRow2.add(dateTimePicker);
         layoutRow2.add(select);
         layoutRow2.add(select2);
-        layoutRow2.add(dateTimePicker);
         layoutRow2.add(select3);
         layoutRow2.add(textField);
         layoutRow2.add(mark);
@@ -102,9 +110,11 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
 
             if(select3.getValue() == "Absent"){
                 upload.setVisible(true);
+                reasonForAbsence.setVisible(true);
             }
             else{
                 upload.setVisible(false);
+                reasonForAbsence.setVisible(false);
             }
         });
 
@@ -119,6 +129,19 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                 System.out.println("NOT");
                 select3.setItems("Absent");
             }
+            ArrayList<String> dailyCourses = new ArrayList<>();
+            ArrayList<String> dailyCourseIDs = new ArrayList<>();
+            for(int i=0; i<courses.size(); i++){
+                if(courses.get(i).getDayOfStudy().toUpperCase().equals(dateTimePicker.getValue().getDayOfWeek().toString().toUpperCase())){
+                    dailyCourses.add(courses.get(i).getCourseName());
+                    dailyCourseIDs.add(courses.get(i).getCourseId());
+                    System.out.println("HERE");
+                }
+            }
+
+            select.setItems(dailyCourses);
+            select2.setItems(dailyCourseIDs);
+
         });
 
         mark.addClickListener(buttonClickEvent -> {
@@ -169,6 +192,10 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
+                select.clear();
+                select2.clear();
+                select3.clear();
+                textField.clear();
             }
             else{
                 warning.setText("Incorrect Code! Review and try again!");
@@ -179,17 +206,47 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
 
     }
 
-    record SampleItem(String value, String label, Boolean disabled) {
-    }
+    private void getCourses(){
+        String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
+        String username = "postgres";
+        String password = "password";
 
-    private void setSelectSampleDataSubject(Select select) {
-        select.setItems("Math", "English", "Computer Science", "History");
-    }
+        String sql = "SELECT * FROM schedules where \"studentID\" = '" + currentStudent.getStudentID() + "'";
+        try {
+            Connection con = DriverManager.getConnection(url, username, password);
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
 
-    private void setSelectSampleDataSectionSection(Select select) {
-        select.setItems("4A", "3A", "3P", "5P");
-    }
-    private void setSelectSampleDataSectionAttendance(Select select) {
-        select.setItems("Present", "Absent");
+            while(rs.next()){
+                courseIDs.add(rs.getString(2));
+            }
+
+            con.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(courseIDs);
+
+        for(int i = 0; i < courseIDs.size(); i++){
+            String sql2 = "SELECT * from courses where \"courseID\" = '" + courseIDs.get(i) + "'";
+            try {
+                Connection con = DriverManager.getConnection(url, username, password);
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(sql2);
+
+                while(rs.next()){
+                    courses.add(new Courses(rs.getString(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getString(4),
+                            rs.getString(5)));
+                }
+                con.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        System.out.println(courses);
+
     }
 }

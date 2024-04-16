@@ -1,6 +1,7 @@
 package com.example.application.views;
 
 import com.example.application.data.Student;
+import com.example.application.data.Teacher;
 import com.example.application.views.attendancesheet.AttendanceSheetView;
 import com.example.application.views.attendancesheetteacher.AttendanceSheetTeacherView;
 import com.example.application.views.profile.ProfileView;
@@ -49,6 +50,7 @@ public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
     public static Student currentStudent = new Student();
+    public static Teacher currentTeacher = new Teacher();
 
     public MainLayout(SecurityService securityService, HttpServletRequest request) {
         this.securityService = securityService;
@@ -144,6 +146,37 @@ public class MainLayout extends AppLayout {
                     LineAwesomeIcon.CLIPBOARD_LIST_SOLID.create()));
             nav.addItem(new SideNavItem("Schedule", ScheduleView.class, LineAwesomeIcon.CALENDAR_ALT.create()));
             nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.USER_GRADUATE_SOLID.create()));
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Object principal = authentication.getPrincipal();
+
+            if (principal instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) principal;
+                String susername = userDetails.getUsername();
+                currentTeacher.setUsername(susername);
+
+                String sql = "select * from teachers where username = '" + susername + "'";
+                System.out.println(sql);
+                String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
+                String username = "postgres";
+                String password = "password";
+                try {
+                    Connection con = DriverManager.getConnection(url, username, password);
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(sql);
+                    rs.next();
+                    currentTeacher.setFirstName(rs.getString(1));
+                    currentTeacher.setSurname(rs.getString(2));
+                    currentTeacher.setTeacherID(rs.getString(4));
+                    currentTeacher.setEmail(rs.getString(5));
+
+                    con.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                System.out.println("THIS TEST FAILED");
+            }
 
         }
         if(request.isUserInRole("ADMIN")){

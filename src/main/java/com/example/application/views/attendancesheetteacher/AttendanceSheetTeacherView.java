@@ -62,9 +62,9 @@ public class AttendanceSheetTeacherView extends Composite<VerticalLayout> {
         basicGrid.getStyle().set("flex-grow", "0");
         setGridSampleData(basicGrid);
         getContent().add(layoutRow);
+        layoutRow.add(dateTimePicker);
         layoutRow.add(select);
         layoutRow.add(select2);
-        layoutRow.add(dateTimePicker);
         layoutRow.add(buttonPrimary);
         getContent().add(basicGrid);
     }

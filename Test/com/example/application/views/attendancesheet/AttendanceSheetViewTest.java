@@ -4,8 +4,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.parameters.P;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -14,6 +17,7 @@ import static com.example.application.views.MainLayout.currentStudent;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AttendanceSheetViewTest {
+    public String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
     public Select select;
     public Select select2;
     public Select select3;
@@ -21,6 +25,8 @@ class AttendanceSheetViewTest {
     public H3 warning;
     public Button mark;
     public boolean ButtonWork;
+    public TextField reasonForAbsence = new TextField("Reason For Absence: ");
+    public Upload upload = new Upload();
 
     @BeforeEach
     void setUp() {
@@ -29,12 +35,27 @@ class AttendanceSheetViewTest {
          dateTimePicker = new DateTimePicker();
          select3 = new Select();
 
+
+        reasonForAbsence.setVisible(false);
+        reasonForAbsence.setVisible(false);
+
         setSelectSampleDataSubject(select);
         setSelectSampleDataSectionSection(select2);
         select3.setItems("Absent", "Present");
 
         warning = new H3("Please make sure to fill in all required forms.");
         warning.setVisible(false);
+
+        select3.addValueChangeListener(e ->{
+            if(select3.getValue() == "Present"){
+                reasonForAbsence.setVisible(false);
+                upload.setVisible(false);
+            }
+            else{
+                reasonForAbsence.setVisible(true);
+                upload.setVisible(true);
+            }
+        });
 
         mark = new Button("Take Attendance");
         mark.addClickListener(buttonClickEvent -> {
@@ -62,7 +83,6 @@ class AttendanceSheetViewTest {
                 String sqlUpdate = "update attendance set \"classAttended\" = " + attend +
                         " where \"attendanceID\" = (select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "')";
                 System.out.println(sqlUpdate);
-                String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
                 String username = "postgres";
                 String password = "password";
                 try {
@@ -147,11 +167,57 @@ class AttendanceSheetViewTest {
 
         assertEquals(false, ButtonWork);
     }
+    @Test
+    void uploadAppears(){
+        select3.setValue("Present");
+        assertEquals(upload.isVisible(), false);
+
+        select3.setValue("Absent");
+        assertEquals(upload.isVisible(), true);
+    }
+
+    @Test
+    void setReasonForAbsenceAppears(){
+        select3.setValue("Present");
+        assertEquals(reasonForAbsence.isVisible(), false);
+
+        select3.setValue("Absent");
+        assertEquals(reasonForAbsence.isVisible(), true);
+    }
+
     private void setSelectSampleDataSubject(Select select) {
         select.setItems("Math", "English", "Computer Science", "History");
+    }
+
+
+    @Test
+    void canAccessDatabase() {
+        String username = "postgres";
+        String password = "password";
+        assertDoesNotThrow(() -> {
+            Connection connection = DriverManager.getConnection(url, username, password);
+            connection.close();
+        }, "Connection to the database should be successful");
+    }
+
+    @Test
+    void setReasonForAbsenceIsNull(){
+        mark.click();
+        assertEquals(true, ButtonWork);
+
+        reasonForAbsence.setValue("TEST PHRASE");
+        mark.click();
+        assertEquals(true, ButtonWork);
+    }
+
+    @Test
+    void uploadIsNull(){
+        mark.click();
+        assertEquals(true, ButtonWork);
     }
 
     private void setSelectSampleDataSectionSection(Select select) {
         select.setItems("4A", "3A", "3P", "5P");
     }
+
 }

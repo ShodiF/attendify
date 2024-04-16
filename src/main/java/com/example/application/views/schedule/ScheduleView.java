@@ -9,6 +9,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 
+import java.util.Calendar;
+
 @PageTitle("Schedule")
 @Route(value = "schedule", layout = MainLayout.class)
 @Uses(Icon.class)

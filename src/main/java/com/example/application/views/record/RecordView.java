@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.parameters.P;
 
 import static com.example.application.Application.*;
+import static com.example.application.views.MainLayout.currentStudent;
 
 @PageTitle("Record")
 @Route(value = "record", layout = MainLayout.class)
@@ -61,7 +62,7 @@ public class RecordView extends Composite<VerticalLayout> {
         getContent().add(basicGrid);
 
         String sql = "select * from attendance";
-        String sql2 = "select * from \"attendanceReport\"";
+        String sql2 = "select * from \"attendanceReport\" where \"studentID\" = '" + currentStudent.getStudentID() + "'";
         String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
         String username = "postgres";
         String password = "password";
@@ -81,18 +82,16 @@ public class RecordView extends Composite<VerticalLayout> {
                 dates.add(n);
                 attId.add(att.getInt(5));
             }
-            att = st.executeQuery(sql);
-            int count = 0;
-            while(att.next()){
-                if(att.getInt(3) == attId.get(count)){
-                    if(att.getBoolean(1)){
-                        status.add("Present");
-                    }
-                    else{
-                        status.add("Absent");
-                    }
+            for(int i=0; i<attId.size(); i++){
+                String sql3 = "SELECT * FROM attendance where \"attendanceID\" = '" + attId.get(i) + "'";
+                att = st.executeQuery(sql3);
+                att.next();
+                if(att.getBoolean(1)){
+                    status.add("Present");
                 }
-                count++;
+                else{
+                    status.add("Absent");
+                }
             }
             con.close();
         } catch (SQLException e) {
@@ -119,12 +118,48 @@ public class RecordView extends Composite<VerticalLayout> {
                 }
             }
             basicGrid.setItems(tempList);
+
         });
 
     }
 
     private void setSelectSampleData(Select select) {
-        select.setItems("Math", "English", "Computer Science", "History");
+        String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
+        String username = "postgres";
+        String password = "password";
+        String sql = "SELECT * from schedules where \"studentID\" = '" + currentStudent.getStudentID() + "'";
+        ArrayList<String> courseIDs = new ArrayList<>();
+        try {
+            Connection con = DriverManager.getConnection(url, username, password);
+            Statement st = con.createStatement();
+            ResultSet att = st.executeQuery(sql);
+
+            while(att.next()){
+                courseIDs.add(att.getString(2));
+            }
+            con.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println(courseIDs + "COURSE IDS THAT ARE IN RECORD");
+        ArrayList<String> courses = new ArrayList<>();
+        for(int i =0; i<courseIDs.size(); i++){
+            String sql2 = "SELECT * FROM courses where \"courseID\" = '" + courseIDs.get(i) + "'";
+            try {
+                Connection con = DriverManager.getConnection(url, username, password);
+                Statement st = con.createStatement();
+                ResultSet att = st.executeQuery(sql2);
+                while(att.next()){
+                    courses.add(att.getString(1));
+                }
+                con.close();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        select.setItems(courses);
+
     }
 
     @Autowired()
