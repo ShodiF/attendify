@@ -1,5 +1,7 @@
 package com.example.application.data;
 
+import com.vaadin.flow.component.checkbox.Checkbox;
+import org.hibernate.annotations.Check;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,6 +15,22 @@ public class Student {
     private String birthday;
     private int yearOfStudy;
     private String attendance;
+    private String status;
+
+    public Student(String firstName, String lastName, String studentID, String status) {
+        this.firstName = firstName;
+        this.surname = lastName;
+        this.studentID = studentID;
+        this.status = status;
+    }
+
+    public Student() {
+
+    }
+
+    public String getStatus(){return status;}
+
+    public void setStatus(String s){ this.status = s; }
 
     public String getAttendance() {
         return attendance;

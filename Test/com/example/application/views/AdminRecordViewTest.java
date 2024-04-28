@@ -1,57 +1,42 @@
-package com.example.application.views.teachersrecord;
-
+package com.example.application.views;
 import com.example.application.data.AttendanceReport;
-import com.example.application.services.SamplePersonService;
-import com.example.application.views.MainLayout;
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
-import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinServletResponse;
-import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-
 import static com.example.application.views.MainLayout.currentTeacher;
+import static org.junit.jupiter.api.Assertions.*;
 
-@PageTitle("Teacher's Record")
-@Route(value = "teachRecord", layout = MainLayout.class)
-@Uses(Icon.class)
-@PermitAll
-@RolesAllowed("TEACHER")
-public class TeachersRecordView extends Composite<VerticalLayout> {
+class AdminRecordViewTest {
+
     public ArrayList<String> s2 = new ArrayList<>();
     public ArrayList<String> s1 = new ArrayList<>();
+    ArrayList<String> subs = new ArrayList<>();
+    ArrayList<String> couID = new ArrayList<>();
+    ArrayList<String> dateT = new ArrayList<>();
+    ArrayList<Integer> atID = new ArrayList<>();
+    ArrayList<String> sID = new ArrayList<>();
+    ArrayList<String> rID = new ArrayList<>();
+    ArrayList<String> stats = new ArrayList<>();
+    ArrayList<String> firstName = new ArrayList<>();
+    ArrayList<String> lastName = new ArrayList<>();
+    ArrayList<String> type = new ArrayList<>();
 
-    public TeachersRecordView() {
-        Select select = new Select();
-        Select select2 = new Select();
+
+    Select select = new Select();
+    Select select2 = new Select();
+
+    @BeforeEach
+    void setUp() {
         Grid basicGrid = new Grid(AttendanceReport.class);
 
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
         select.setLabel("Subject");
         select.setWidth("min-content");
         setSelectSampleData(select);
@@ -67,8 +52,6 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         HorizontalLayout h1 = new HorizontalLayout();
         h1.add(select);
         h1.add(select2);
-        getContent().add(h1);
-        getContent().add(basicGrid);
 
         select.addValueChangeListener(e -> {
             ArrayList<String> temp = new ArrayList<>();
@@ -81,17 +64,6 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         });
 
         select2.addValueChangeListener(e ->{
-            ArrayList<String> subs = new ArrayList<>();
-            ArrayList<String> couID = new ArrayList<>();
-            ArrayList<String> dateT = new ArrayList<>();
-            ArrayList<Integer> atID = new ArrayList<>();
-            ArrayList<String> sID = new ArrayList<>();
-            ArrayList<String> rID = new ArrayList<>();
-            ArrayList<String> stats = new ArrayList<>();
-            ArrayList<String> firstName = new ArrayList<>();
-            ArrayList<String> lastName = new ArrayList<>();
-            ArrayList<String> type = new ArrayList<>();
-
             ArrayList<AttendanceReport> reports = new ArrayList<>();
             String sql2 = "select * from \"attendanceReport\" where \"courseID\" = '" + select2.getValue() + "'";
             String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
@@ -150,7 +122,6 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         });
     }
 
-
     private void setSelectSampleData(Select select) {
         String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
         String username = "postgres";
@@ -178,7 +149,25 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         select.setItems(temp);
     }
 
-    private void setGridSampleData(Grid grid) {
+    @Test
+    void adminGridIsPopulated(){
+        select.setValue("Economics");
+        select2.setValue("EC2");
+
+        assertEquals(true,subs.size()>1);
+        assertEquals(true,couID.size()>1);
+        assertEquals(true,dateT.size()>1);
+        assertEquals(true,atID.size()>1);
     }
 
+    @Test
+    void adminCorrectInfoIsFilled(){
+        select.setValue("Economics");
+        select2.setValue("EC2");
+
+        assertEquals(true,stats.size()>1);
+        assertEquals(true,firstName.size()>1);
+        assertEquals(true,lastName.size()>1);
+        assertEquals(true,type.size()>1);
+    }
 }

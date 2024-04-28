@@ -24,6 +24,7 @@ class AttendanceSheetViewTest {
     public DateTimePicker dateTimePicker;
     public H3 warning;
     public Button mark;
+    public Button peerHelp = new Button("Ask Peer");
     public boolean ButtonWork;
     public TextField reasonForAbsence = new TextField("Reason For Absence: ");
     public Upload upload = new Upload();
@@ -124,6 +125,7 @@ class AttendanceSheetViewTest {
     }
 
 
+
     @Test
     void takeAttendanceWorks(){
         mark.click();
@@ -189,6 +191,56 @@ class AttendanceSheetViewTest {
         select.setItems("Math", "English", "Computer Science", "History");
     }
 
+    @Test
+    void canRequestPeer(){
+        peerHelp.addClickListener(e -> {
+            if(select.isEmpty() || select2.isEmpty() || select3.isEmpty() || dateTimePicker.isEmpty()){
+                warning.setVisible(true);
+                ButtonWork = false;
+            }
+            else{
+                boolean attend = false;
+                warning.setVisible(false);
+                if(select3.getValue() == "Present"){
+                    attend = true;
+                }
+                else{
+                    attend = false;
+                }
+                String selectedDateTime = dateTimePicker.getValue().toString();
+                String sql = "insert into \"attendanceReport\" (\"studentID\", \"courseID\", \"dateTime\", \"courseName\") values ('" +
+                        currentStudent.getStudentID() + "', '" + select2.getValue()+  "', '" + selectedDateTime +"', '" + select.getValue() + "')";
+                String sqlTwo = "select * from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "'";
+                String sqlThree = "insert into attendance (\"attendanceID\", \"classAttended\", \"typeOfAttendance\") \n" +
+                        "\tvalues \n" +
+                        "\t((select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime +
+                        "' ),"  + attend + ", 'Online')";
+                String sqlUpdate = "update attendance set \"classAttended\" = " + attend +
+                        " where \"attendanceID\" = (select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "')";
+                System.out.println(sqlUpdate);
+                String username = "postgres";
+                String password = "password";
+                try {
+                    Connection con = DriverManager.getConnection(url, username, password);
+                    Statement st = con.createStatement();
+                    ResultSet rs = st.executeQuery(sqlTwo);
+                    if(!rs.next()){
+                        st.executeUpdate(sql);
+                        st.executeUpdate(sqlThree);
+                    }else{
+                        st.executeUpdate(sqlUpdate);
+                    }
+                    con.close();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            ButtonWork = true;
+        });
+
+        peerHelp.click();
+        assertEquals(true, ButtonWork);
+    }
 
     @Test
     void canAccessDatabase() {
@@ -198,6 +250,17 @@ class AttendanceSheetViewTest {
             Connection connection = DriverManager.getConnection(url, username, password);
             connection.close();
         }, "Connection to the database should be successful");
+    }
+
+    @Test
+    void correctDaysClass(){
+        dateTimePicker.setValue(LocalDateTime.now());
+        dateTimePicker.getValue().getDayOfWeek();
+
+        assertEquals(LocalDateTime.now().getDayOfWeek(), dateTimePicker.getValue().getDayOfWeek());
+
+        mark.click();
+        assertEquals(true, ButtonWork);
     }
 
     @Test

@@ -2,6 +2,8 @@ package com.example.application.data;
 
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
 public class AttendanceReport {
     private String subject;
@@ -11,9 +13,18 @@ public class AttendanceReport {
     private String studentName;
     private String studentID;
     private String reasonForAbsence;
-    private String supportingDocs;
+    private File supportingDocs;
+    private String typeOfAtt;
 
-    public AttendanceReport(String s, String s1, String s2, String s3, String sName, String s4, String s5, String s6) {
+    public String getTypeOfAtt() {
+        return typeOfAtt;
+    }
+
+    public void setTypeOfAtt(String typeOfAtt) {
+        this.typeOfAtt = typeOfAtt;
+    }
+
+    public AttendanceReport(String s, String s1, String s2, String s3, String sName, String s4, String s5, File s6, String s7) {
         this.subject = s;
         this.dateAndTime = s2;
         this.attendanceStatus = s3;
@@ -21,6 +32,7 @@ public class AttendanceReport {
         this.studentID = s4;
         this.reasonForAbsence = s5;
         this.supportingDocs = s6;
+        this.typeOfAtt = s7;
     }
 
     public String getStudentName() {
@@ -47,21 +59,22 @@ public class AttendanceReport {
         this.reasonForAbsence = reasonForAbsence;
     }
 
-    public String getSupportingDocs() {
+    public File getSupportingDocs() {
         return supportingDocs;
     }
 
-    public void setSupportingDocs(String supportingDocs) {
+    public void setSupportingDocs(File supportingDocs) {
         this.supportingDocs = supportingDocs;
     }
 
     public AttendanceReport(){}
 
-    public AttendanceReport(String subject, String courseID, String dateAndTime, String attendanceStatus) {
+    public AttendanceReport(String subject, String courseID, String dateAndTime, String attendanceStatus, String type) {
         this.subject = subject;
         this.courseID = courseID;
         this.dateAndTime = dateAndTime;
         this.attendanceStatus = attendanceStatus;
+        this.typeOfAtt = type;
     }
 
     public String getSubject() {

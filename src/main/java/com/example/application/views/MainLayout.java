@@ -98,7 +98,7 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        nav.addItem(new SideNavItem("Welcome"));
+        nav.addItem(new SideNavItem("Welcome", ImageView.class));
         if(request.isUserInRole("USER")){
             nav.addItem(new SideNavItem("Attendance Sheet", AttendanceSheetView.class, LineAwesomeIcon.FILE_ALT.create()));
             nav.addItem(new SideNavItem("Record", RecordView.class, LineAwesomeIcon.CLIPBOARD_LIST_SOLID.create()));
@@ -182,7 +182,7 @@ public class MainLayout extends AppLayout {
         if(request.isUserInRole("ADMIN")){
             nav.addItem(
                     new SideNavItem("Student Stats", StudentStatsView.class, LineAwesomeIcon.CHART_AREA_SOLID.create()));
-
+            nav.addItem(new SideNavItem("Admin Record", AdminRecordView.class, LineAwesomeIcon.CLIPBOARD_LIST_SOLID.create()));
             nav.addItem(new SideNavItem("User Management", UserManagementView.class, LineAwesomeIcon.USERS_SOLID.create()));
             nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.USER_GRADUATE_SOLID.create()));
         }

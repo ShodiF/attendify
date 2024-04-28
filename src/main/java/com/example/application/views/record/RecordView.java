@@ -45,6 +45,7 @@ public class RecordView extends Composite<VerticalLayout> {
         ArrayList<String> dates = new ArrayList<>();
         ArrayList<Integer> attId = new ArrayList<>();
         ArrayList<String> status = new ArrayList<>();
+        ArrayList<String> type = new ArrayList<>();
 
         getContent().setWidth("100%");
         getContent().getStyle().set("flex-grow", "1");
@@ -55,7 +56,7 @@ public class RecordView extends Composite<VerticalLayout> {
         basicGrid.getStyle().set("flex-grow", "0");
 
         basicGrid.setItems();
-        basicGrid.setColumns("subject", "courseID", "dateAndTime", "attendanceStatus");
+        basicGrid.setColumns("subject", "courseID", "dateAndTime", "attendanceStatus", "typeOfAtt");
 
         //setGridSampleData(basicGrid);
         getContent().add(select);
@@ -88,9 +89,11 @@ public class RecordView extends Composite<VerticalLayout> {
                 att.next();
                 if(att.getBoolean(1)){
                     status.add("Present");
+                    type.add(att.getString(2));
                 }
                 else{
                     status.add("Absent");
+                    type.add(att.getString(2));
                 }
             }
             con.close();
@@ -105,7 +108,7 @@ public class RecordView extends Composite<VerticalLayout> {
 
         for(int i = 0; i< subjects.size(); i++){
             listOfAtt.add(
-                    new AttendanceReport(subjects.get(i), cIDs.get(i), dates.get(i), status.get(i)));
+                    new AttendanceReport(subjects.get(i), cIDs.get(i), dates.get(i), status.get(i), type.get(i)));
         }
         basicGrid.setItems(listOfAtt);
         System.out.println(listOfAtt);
