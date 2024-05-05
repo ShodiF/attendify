@@ -3,6 +3,7 @@ package com.example.application.views;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.model.Pane;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.html.*;
@@ -41,6 +42,7 @@ public class ImageView extends VerticalLayout {
         // Add the image component to the layout
         add(image);
 
+
         if(request.isUserInRole("USER")){
             VerticalLayout v1 = new VerticalLayout();
 
@@ -61,6 +63,7 @@ public class ImageView extends VerticalLayout {
                         message.setText(rs.getString(1).toUpperCase() + " " + rs.getString(8).toUpperCase() + " has requested that you mark their attendance for " + rs.getString(4) + " " + rs.getString(5));
                         message.getElement().getStyle().setColor("Blue");
                         HorizontalLayout h1 = new HorizontalLayout();
+                        h1.getElement().getStyle().setBorderRadius("15px");
                         Button reject = new Button("Decline Request!");
                         remove(image);
                         Button mark = new Button("Mark Present");
@@ -79,6 +82,14 @@ public class ImageView extends VerticalLayout {
                         code.setLabel("Code");
                         h1.setVerticalComponentAlignment(FlexComponent.Alignment.END, mark);
                         h1.setVerticalComponentAlignment(FlexComponent.Alignment.END, reject);
+
+                        Button undo = new Button("Undo Reject");
+                        Button delete = new Button("Delete Request");
+
+                        HorizontalLayout h2 = new HorizontalLayout(undo, delete);
+                        delete.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+                        undo.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+
 
                         section.setValue(rs.getString(5));
                         section.setReadOnly(true);
@@ -128,10 +139,8 @@ public class ImageView extends VerticalLayout {
                                 try {
                                     Connection con5 = DriverManager.getConnection(url, username, password);
                                     Statement st5 = con5.createStatement();
-                                    //String deleteSQL = "delete from \"peerRequest\" where \"requestID\" = " +  String.valueOf(reqID);
-                                    String updateStatus = "update \"requestStatus\" set status = 'Marked' where reques = " + reqID;
-                                    //st5.execute(deleteSQL);
-                                    st5.execute(updateStatus);
+                                    String deleteSQL = "delete from \"peerRequest\" where \"section\" = '" +  section.getValue() + "' and \"dateTime\" = '" + dT + "'";
+                                    st5.execute(deleteSQL);
                                     con5.close();
                                 } catch (SQLException ex) {
                                     throw new RuntimeException(ex);
@@ -143,6 +152,16 @@ public class ImageView extends VerticalLayout {
                             }
                         });
                         reject.addClickListener(e -> {
+                            reject.setEnabled(false);
+                            mark.setEnabled(false);
+                            code.setReadOnly(true);
+                            h1.add(h2);
+                            h2.setVerticalComponentAlignment(FlexComponent.Alignment.END, undo);
+                            h2.setVerticalComponentAlignment(FlexComponent.Alignment.END, delete);
+                            //h1.getElement().getStyle().setBackground("#F47878");
+                        });
+
+                        delete.addClickListener(e -> {
                             try {
                                 Connection con2 = DriverManager.getConnection(url, username, password);
                                 Statement st2 = con2.createStatement();
@@ -155,6 +174,14 @@ public class ImageView extends VerticalLayout {
                             v1.remove(h1);
                             message.setText("Request Has Been Denied!");
                             message.getElement().getStyle().setColor("Red");
+                            h1.remove(h2);
+                        });
+
+                        undo.addClickListener(e -> {
+                            reject.setEnabled(true);
+                            mark.setEnabled(true);
+                            code.setReadOnly(false);
+                            h1.remove(h2);
                         });
                     }
                 }

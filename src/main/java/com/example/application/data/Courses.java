@@ -6,6 +6,15 @@ public class Courses {
     String dayOfStudy;
     String startTime;
     String endTime;
+    double absentRate;
+
+    public double getAbsentRate() {
+        return absentRate;
+    }
+
+    public void setAbsentRate(double absentRate) {
+        this.absentRate = absentRate;
+    }
 
     public Courses(String courseName, String courseId, String dayOfStudy, String startTime, String endTime) {
         this.courseName = courseName;
@@ -14,6 +23,13 @@ public class Courses {
         this.startTime = startTime;
         this.endTime = endTime;
     }
+
+    public Courses(String c, String x, double absentRate){
+        this.courseName = c;
+        this.courseId = x;
+        this.absentRate = absentRate;
+    }
+
 
     public Courses() {
     }

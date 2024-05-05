@@ -2,52 +2,38 @@ package com.example.application.views.studentstats;
 
 import com.example.application.data.Courses;
 import com.example.application.data.Student;
-import com.example.application.views.MainLayout;
-import com.vaadin.flow.component.Composite;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
+import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
+import static org.junit.jupiter.api.Assertions.*;
 
-@PageTitle("Student Stats")
-@Route(value = "dashboard", layout = MainLayout.class)
-@Uses(Icon.class)
-@PermitAll
-@RolesAllowed("ADMIN")
-public class StudentStatsView extends Composite<VerticalLayout> {
+class StudentStatsViewTest {
 
     ArrayList<Courses> courses = new ArrayList<>();
     ArrayList<Student> students = new ArrayList<>();
 
-    public StudentStatsView() {
+    @BeforeEach
+    void setUp() {
         HorizontalLayout layoutRow = new HorizontalLayout();
         H1 h1 = new H1();
-        getContent().setWidth("100%");
-        getContent().getStyle().set("flex-grow", "1");
+
         layoutRow.setWidthFull();
-        getContent().setFlexGrow(1.0, layoutRow);
-        layoutRow.addClassName(Gap.MEDIUM);
+
+        layoutRow.addClassName(LumoUtility.Gap.MEDIUM);
         layoutRow.setWidth("100%");
         layoutRow.setHeight("100px");
         h1.setText("Statistics:");
         h1.setWidth("max-content");
         h1.setHeight("100px");
-        getContent().add(h1);
-        getContent().add(layoutRow);
+
 
         Grid courseStat = new Grid(Courses.class);
         courseStat.setColumns("courseName", "courseId", "absentRate");
@@ -83,8 +69,8 @@ public class StudentStatsView extends Composite<VerticalLayout> {
                             total++;
                         }
                         else{
-                           total++;
-                           absent++;
+                            total++;
+                            absent++;
                         }
                     }
                 }
@@ -160,4 +146,15 @@ public class StudentStatsView extends Composite<VerticalLayout> {
         layoutRow.setHeight("100%");
         studentStat.setWidth("50%");
     }
+
+    @Test
+    void courseGridIsPopulated(){
+        assertEquals(true, courses.size()>0);
+    }
+
+    @Test
+    void studentGridIsPopulated(){
+        assertEquals(true, students.size()>0);
+    }
+
 }

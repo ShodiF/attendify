@@ -16,6 +16,7 @@ public class Student {
     private int yearOfStudy;
     private String attendance;
     private String status;
+    private double absentRate;
 
     public Student(String firstName, String lastName, String studentID, String status) {
         this.firstName = firstName;
@@ -26,6 +27,20 @@ public class Student {
 
     public Student() {
 
+    }
+    public Student(String firstName, String lastName, String studentID, double absentRate) {
+        this.firstName = firstName;
+        this.surname = lastName;
+        this.studentID = studentID;
+        this.absentRate = absentRate;
+    }
+
+    public double getAbsentRate() {
+        return absentRate;
+    }
+
+    public void setAbsentRate(double absentRate) {
+        this.absentRate = absentRate;
     }
 
     public String getStatus(){return status;}

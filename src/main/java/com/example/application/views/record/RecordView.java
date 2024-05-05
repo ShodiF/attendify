@@ -62,6 +62,8 @@ public class RecordView extends Composite<VerticalLayout> {
         getContent().add(select);
         getContent().add(basicGrid);
 
+
+
         String sql = "select * from attendance";
         String sql2 = "select * from \"attendanceReport\" where \"studentID\" = '" + currentStudent.getStudentID() + "'";
         String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";

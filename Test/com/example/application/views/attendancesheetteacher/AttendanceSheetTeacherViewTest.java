@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import static com.example.application.views.MainLayout.currentStudent;
 import static org.junit.jupiter.api.Assertions.*;
 
-class AttendanceSheetViewTest {
+class AttendanceSheetTeacherViewTest {
     public String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
     public Select select;
     public Select select2;
@@ -31,10 +31,12 @@ class AttendanceSheetViewTest {
 
     @BeforeEach
     void setUp() {
-         select = new Select();
-         select2 = new Select();
-         dateTimePicker = new DateTimePicker();
-         select3 = new Select();
+        select = new Select();
+        select2 = new Select();
+        dateTimePicker = new DateTimePicker();
+        select3 = new Select();
+
+
         reasonForAbsence.setVisible(false);
         reasonForAbsence.setVisible(false);
 
@@ -130,115 +132,11 @@ class AttendanceSheetViewTest {
         assertEquals(true, ButtonWork);
     }
 
-    @Test
-    void allIsNull(){
-        select.setValue(null);
-        dateTimePicker.setValue(null);
-        select2.setValue(null);
-        select3.setValue(null);
-
-        assertEquals(false, ButtonWork);
-
-        select.setValue(1);
-        dateTimePicker.setValue(null);
-        select2.setValue(null);
-        select3.setValue(null);
-
-        assertEquals(false, ButtonWork);
-
-        select.setValue(null);
-        dateTimePicker.setValue(null);
-        select2.setValue(1);
-        select3.setValue(null);
-
-        assertEquals(false, ButtonWork);
-
-        select.setValue(null);
-        dateTimePicker.setValue(null);
-        select2.setValue(null);
-        select3.setValue(1);
-
-        assertEquals(false, ButtonWork);
-
-        select.setValue(null);
-        dateTimePicker.setValue(LocalDateTime.now());
-        select2.setValue(null);
-        select3.setValue(null);
-
-        assertEquals(false, ButtonWork);
-    }
-    @Test
-    void uploadAppears(){
-        select3.setValue("Present");
-        assertEquals(upload.isVisible(), false);
-
-        select3.setValue("Absent");
-        assertEquals(upload.isVisible(), true);
-    }
-
-    @Test
-    void setReasonForAbsenceAppears(){
-        select3.setValue("Present");
-        assertEquals(reasonForAbsence.isVisible(), false);
-
-        select3.setValue("Absent");
-        assertEquals(reasonForAbsence.isVisible(), true);
-    }
 
     private void setSelectSampleDataSubject(Select select) {
         select.setItems("Math", "English", "Computer Science", "History");
     }
 
-    @Test
-    void canRequestPeer(){
-        peerHelp.addClickListener(e -> {
-            if(select.isEmpty() || select2.isEmpty() || select3.isEmpty() || dateTimePicker.isEmpty()){
-                warning.setVisible(true);
-                ButtonWork = false;
-            }
-            else{
-                boolean attend = false;
-                warning.setVisible(false);
-                if(select3.getValue() == "Present"){
-                    attend = true;
-                }
-                else{
-                    attend = false;
-                }
-                String selectedDateTime = dateTimePicker.getValue().toString();
-                String sql = "insert into \"attendanceReport\" (\"studentID\", \"courseID\", \"dateTime\", \"courseName\") values ('" +
-                        currentStudent.getStudentID() + "', '" + select2.getValue()+  "', '" + selectedDateTime +"', '" + select.getValue() + "')";
-                String sqlTwo = "select * from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "'";
-                String sqlThree = "insert into attendance (\"attendanceID\", \"classAttended\", \"typeOfAttendance\") \n" +
-                        "\tvalues \n" +
-                        "\t((select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime +
-                        "' ),"  + attend + ", 'Online')";
-                String sqlUpdate = "update attendance set \"classAttended\" = " + attend +
-                        " where \"attendanceID\" = (select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "')";
-                System.out.println(sqlUpdate);
-                String username = "postgres";
-                String password = "password";
-                try {
-                    Connection con = DriverManager.getConnection(url, username, password);
-                    Statement st = con.createStatement();
-                    ResultSet rs = st.executeQuery(sqlTwo);
-                    if(!rs.next()){
-                        st.executeUpdate(sql);
-                        st.executeUpdate(sqlThree);
-                    }else{
-                        st.executeUpdate(sqlUpdate);
-                    }
-                    con.close();
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            ButtonWork = true;
-        });
-
-        peerHelp.click();
-        assertEquals(true, ButtonWork);
-    }
 
     @Test
     void canAccessDatabase() {
@@ -250,32 +148,7 @@ class AttendanceSheetViewTest {
         }, "Connection to the database should be successful");
     }
 
-    @Test
-    void correctDaysClass(){
-        dateTimePicker.setValue(LocalDateTime.now());
-        dateTimePicker.getValue().getDayOfWeek();
 
-        assertEquals(LocalDateTime.now().getDayOfWeek(), dateTimePicker.getValue().getDayOfWeek());
-
-        mark.click();
-        assertEquals(true, ButtonWork);
-    }
-
-    @Test
-    void setReasonForAbsenceIsNull(){
-        mark.click();
-        assertEquals(true, ButtonWork);
-
-        reasonForAbsence.setValue("TEST PHRASE");
-        mark.click();
-        assertEquals(true, ButtonWork);
-    }
-
-    @Test
-    void uploadIsNull(){
-        mark.click();
-        assertEquals(true, ButtonWork);
-    }
 
     private void setSelectSampleDataSectionSection(Select select) {
         select.setItems("4A", "3A", "3P", "5P");

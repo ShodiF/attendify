@@ -102,7 +102,7 @@ public class MainLayout extends AppLayout {
         if(request.isUserInRole("USER")){
             nav.addItem(new SideNavItem("Attendance Sheet", AttendanceSheetView.class, LineAwesomeIcon.FILE_ALT.create()));
             nav.addItem(new SideNavItem("Record", RecordView.class, LineAwesomeIcon.CLIPBOARD_LIST_SOLID.create()));
-            nav.addItem(new SideNavItem("Schedule", ScheduleView.class, LineAwesomeIcon.CALENDAR_ALT.create()));
+            //nav.addItem(new SideNavItem("Schedule", ScheduleView.class, LineAwesomeIcon.CALENDAR_ALT.create()));
             nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.USER_GRADUATE_SOLID.create()));
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -144,7 +144,7 @@ public class MainLayout extends AppLayout {
                     LineAwesomeIcon.FILE_ALT.create()));
             nav.addItem(new SideNavItem("Teacher's Record", TeachersRecordView.class,
                     LineAwesomeIcon.CLIPBOARD_LIST_SOLID.create()));
-            nav.addItem(new SideNavItem("Schedule", ScheduleView.class, LineAwesomeIcon.CALENDAR_ALT.create()));
+            //nav.addItem(new SideNavItem("Schedule", ScheduleView.class, LineAwesomeIcon.CALENDAR_ALT.create()));
             nav.addItem(new SideNavItem("Profile", ProfileView.class, LineAwesomeIcon.USER_GRADUATE_SOLID.create()));
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

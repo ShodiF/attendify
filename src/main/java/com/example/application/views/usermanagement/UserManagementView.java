@@ -71,7 +71,7 @@ public class UserManagementView extends Div {
         SplitLayout splitLayout = new SplitLayout();
 
         createGridLayout(splitLayout);
-        createEditorLayout(splitLayout);
+       // createEditorLayout(splitLayout);
 
         add(splitLayout);
 
@@ -181,30 +181,30 @@ public class UserManagementView extends Div {
         });
     }
 
-    private void createEditorLayout(SplitLayout splitLayout) {
-        Div editorLayoutDiv = new Div();
-        editorLayoutDiv.setClassName("editor-layout");
-
-        Div editorDiv = new Div();
-        editorDiv.setClassName("editor");
-        editorLayoutDiv.add(editorDiv);
-
-        FormLayout formLayout = new FormLayout();
-//        firstName = new TextField("First Name");
-//        lastName = new TextField("Last Name");
-//        email = new TextField("Email");
-//        username = new TextField("Phone");
-//        id = new DatePicker("Date Of Birth");
-//        occupation = new TextField("Occupation");
-//        role = new TextField("Role");
-//        important = new Checkbox("Important");
-//        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, role, important);
-
-        editorDiv.add(formLayout);
-        createButtonLayout(editorLayoutDiv);
-
-        splitLayout.addToSecondary(editorLayoutDiv);
-    }
+//    private void createEditorLayout(SplitLayout splitLayout) {
+//        Div editorLayoutDiv = new Div();
+//        editorLayoutDiv.setClassName("editor-layout");
+//
+//        Div editorDiv = new Div();
+//        editorDiv.setClassName("editor");
+//        editorLayoutDiv.add(editorDiv);
+//
+//        FormLayout formLayout = new FormLayout();
+////        firstName = new TextField("First Name");
+////        lastName = new TextField("Last Name");
+////        email = new TextField("Email");
+////        username = new TextField("Phone");
+////        id = new DatePicker("Date Of Birth");
+////        occupation = new TextField("Occupation");
+////        role = new TextField("Role");
+////        important = new Checkbox("Important");
+////        formLayout.add(firstName, lastName, email, phone, dateOfBirth, occupation, role, important);
+//
+//        editorDiv.add(formLayout);
+//        createButtonLayout(editorLayoutDiv);
+//
+//        splitLayout.addToSecondary(editorLayoutDiv);
+//    }
 
     private void createButtonLayout(Div editorLayoutDiv) {
         HorizontalLayout buttonLayout = new HorizontalLayout();
@@ -234,6 +234,5 @@ public class UserManagementView extends Div {
     private void populateForm(Users value) {
         this.user = value;
         //binder.readBean(this.user);
-
     }
 }

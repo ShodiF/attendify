@@ -1,9 +1,11 @@
 package com.example.application.views.teachersrecord;
 
 import com.example.application.data.AttendanceReport;
+import com.example.application.data.Student;
 import com.example.application.services.SamplePersonService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.Composite;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Grid;
@@ -17,10 +19,7 @@ import com.vaadin.flow.server.VaadinServletResponse;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,10 +28,12 @@ import java.util.Set;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+
 
 import static com.example.application.views.MainLayout.currentTeacher;
 
@@ -61,7 +62,16 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         basicGrid.getStyle().set("flex-grow", "0");
 
         basicGrid.setItems();
-        basicGrid.setColumns("studentName", "studentID", "dateAndTime", "attendanceStatus", "typeOfAtt","reasonForAbsence", "supportingDocs");
+        basicGrid.setColumns("studentName", "studentID", "dateAndTime", "attendanceStatus", "typeOfAtt", "reasonForAbsence");
+
+        basicGrid.addSelectionListener(e -> {
+            Set<AttendanceReport> s1 = e.getAllSelectedItems();
+            ArrayList<AttendanceReport> selected = new ArrayList<>(s1);
+            if(selected.get(0).getSupportingDocs() != null){
+                System.out.println(selected.get(0).getSupportingDocs());
+                File file = selected.get(0).getSupportingDocs();
+            }
+        });
 
         //setGridSampleData(basicGrid);
         HorizontalLayout h1 = new HorizontalLayout();
@@ -143,6 +153,7 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
             }
             for(int i = 0; i<couID.size(); i++){
                 String sName = firstName.get(i) + " " + lastName.get(i);
+                File f = new File("Test.pdf");
                 AttendanceReport r = new AttendanceReport(subs.get(i), couID.get(i), dateT.get(i),stats.get(i), sName,  sID.get(i), rID.get(i), null, type.get(i));
                 reports.add(r);
             }
@@ -176,9 +187,6 @@ public class TeachersRecordView extends Composite<VerticalLayout> {
         temp.addAll(set);
 
         select.setItems(temp);
-    }
-
-    private void setGridSampleData(Grid grid) {
     }
 
 }

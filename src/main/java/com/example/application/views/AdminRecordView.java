@@ -48,7 +48,7 @@ public class AdminRecordView extends Composite<VerticalLayout> {
         basicGrid.getStyle().set("flex-grow", "0");
 
         basicGrid.setItems();
-        basicGrid.setColumns("studentName", "studentID", "dateAndTime", "attendanceStatus", "typeOfAtt","reasonForAbsence", "supportingDocs");
+        basicGrid.setColumns("studentName", "studentID", "dateAndTime", "attendanceStatus", "typeOfAtt","reasonForAbsence");
 
         //setGridSampleData(basicGrid);
         HorizontalLayout h1 = new HorizontalLayout();

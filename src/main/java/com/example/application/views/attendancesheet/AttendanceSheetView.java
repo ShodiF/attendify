@@ -144,7 +144,13 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
         otherStudents.addSelectionListener(selection -> {
             Set<Student> s1 = selection.getAllSelectedItems();
             ArrayList<Student> selectedPeople = new ArrayList<>(s1);
-            if(selection.getAllSelectedItems().size() > 0){
+            boolean d = false;
+            for(int i = 0; i<selectedPeople.size(); i++){
+                if(!selectedPeople.get(i).getStatus().equals("Sent")){
+                    d = true;
+                }
+            }
+            if(selection.getAllSelectedItems().size() > 0 && d){
                 sendRequest.setVisible(true);
                 sendToStudents = selectedPeople;
             }
@@ -288,6 +294,7 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                         }
                         otherStudents.setVisible(false);
                         sendRequest.setVisible(false);
+                        successSend.setText("Request sent to " + sendToStudents.size() + " students.");
                         successSend.setVisible(true);
                     }
                     con.close();
@@ -360,22 +367,20 @@ public class AttendanceSheetView extends Composite<VerticalLayout> {
                     attend = false;
                 }
                 String selectedDateTime = dateTimePicker.getValue().toString();
-                String sql = "insert into \"attendanceReport\" (\"studentID\", \"courseID\", \"dateTime\", \"courseName\") values ('" +
-                        currentStudent.getStudentID() + "', '" + select2.getValue()+  "', '" + selectedDateTime +"', '" + select.getValue() + "')";
+                String sql = "insert into \"attendanceReport\" (\"studentID\", \"courseID\", \"reasonID\",\"dateTime\", \"courseName\") values ('" +
+                        currentStudent.getStudentID() + "', '" + select2.getValue() + "', '" + reasonForAbsence.getValue() + "', '" + selectedDateTime + "', '" + select.getValue() + "')";
                 String sqlTwo = "select * from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "'";
                 String sqlThree = "insert into attendance (\"attendanceID\", \"classAttended\", \"typeOfAttendance\") \n" +
                         "\tvalues \n" +
                         "\t((select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime +
-                        "' ),"  + attend + ", 'Online')" ;
+                        "' ),"  + attend + ", 'Online')";
                 String sqlUpdate = "update attendance set \"classAttended\" = " + attend +
                         " where \"attendanceID\" = (select \"attendanceID\" from \"attendanceReport\" where \"dateTime\" = '" + selectedDateTime + "')";
-                System.out.println(sqlUpdate);
                 String url = "jdbc:postgresql://localhost:5432/AttendiftDBS";
                 String username = "postgres";
                 String password = "password";
                 System.out.println(sql);
                 try {
-
                     Connection con = DriverManager.getConnection(url, username, password);
                     Statement st = con.createStatement();
                     ResultSet rs = st.executeQuery(sqlTwo);
